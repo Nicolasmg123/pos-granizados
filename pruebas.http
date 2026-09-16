@@ -1,0 +1,25 @@
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Granizado de Mango",
+  "precio": 5000,
+  "stock": 20
+}
+###
+
+GET http://localhost:3000/productos
+###
+
+PUT http://localhost:3000/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Granizado de Mango Grande",
+  "precio": 6000,
+  "stock": 25
+}
+
+###
+
+DELETE http://localhost:3000/productos/1

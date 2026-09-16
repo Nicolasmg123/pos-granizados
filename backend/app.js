@@ -57,7 +57,104 @@ app.get('/productos', async (req, res) => {
         });
     }
 });
+// Crear un producto
+app.post('/productos', async (req, res) => {
+    try {
+        const { nombre, precio, stock } = req.body;
 
+        if (!nombre || precio === undefined || stock === undefined) {
+            return res.status(400).json({
+                error: 'Nombre, precio y stock son obligatorios'
+            });
+        }
+
+        if (precio <= 0 || stock < 0) {
+            return res.status(400).json({
+                error: 'El precio debe ser mayor que 0 y el stock no puede ser negativo'
+            });
+        }
+
+        const resultado = await db.run(
+            'INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)',
+            [nombre, precio, stock]
+        );
+
+        res.status(201).json({
+            mensaje: 'Producto creado correctamente',
+            id: resultado.lastID
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al crear el producto'
+        });
+    }
+});
+// Actualizar un producto
+app.put('/productos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, precio, stock } = req.body;
+
+        if (!nombre || precio === undefined || stock === undefined) {
+            return res.status(400).json({
+                error: 'Nombre, precio y stock son obligatorios'
+            });
+        }
+
+        if (precio <= 0 || stock < 0) {
+            return res.status(400).json({
+                error: 'El precio debe ser mayor que 0 y el stock no puede ser negativo'
+            });
+        }
+
+        const resultado = await db.run(
+            'UPDATE productos SET nombre = ?, precio = ?, stock = ? WHERE id = ?',
+            [nombre, precio, stock, id]
+        );
+
+        if (resultado.changes === 0) {
+            return res.status(404).json({
+                error: 'Producto no encontrado'
+            });
+        }
+
+        res.json({
+            mensaje: 'Producto actualizado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al actualizar el producto'
+        });
+    }
+});
+// Eliminar un producto
+app.delete('/productos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const resultado = await db.run(
+            'DELETE FROM productos WHERE id = ?',
+            [id]
+        );
+
+        if (resultado.changes === 0) {
+            return res.status(404).json({
+                error: 'Producto no encontrado'
+            });
+        }
+
+        res.json({
+            mensaje: 'Producto eliminado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al eliminar el producto'
+        });
+    }
+});
 // Iniciar servidor
 iniciarBaseDeDatos()
     .then(() => {
