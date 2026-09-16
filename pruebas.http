@@ -23,3 +23,28 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:3000/productos/1
+###
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Nicolas",
+  "email": "nicolas@granizados.com",
+  "password": "123456",
+  "rol": "Administrador"
+}
+###
+
+GET http://localhost:3000/usuarios
+###
+
+PUT http://localhost:3000/usuarios/1
+Content-Type: application/json
+
+{
+  "nombre": "Nicolas Moreno",
+  "email": "nicolas@granizados.com",
+  "password": "123456",
+  "rol": "Administrador"
+}

@@ -18,13 +18,21 @@ async function iniciarBaseDeDatos() {
     });
 
     await db.exec(`
-        CREATE TABLE IF NOT EXISTS productos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            precio REAL NOT NULL,
-            stock INTEGER NOT NULL DEFAULT 0
-        )
-    `);
+    CREATE TABLE IF NOT EXISTS productos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        precio REAL NOT NULL,
+        stock INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        rol TEXT NOT NULL
+    )
+`);
 
     console.log('Base de datos SQLite conectada');
 }
@@ -152,6 +160,113 @@ app.delete('/productos/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({
             error: 'Error al eliminar el producto'
+        });
+    }
+});
+// Crear un usuario
+app.post('/usuarios', async (req, res) => {
+    try {
+        const { nombre, email, password, rol } = req.body;
+
+        if (!nombre || !email || !password || !rol) {
+            return res.status(400).json({
+                error: 'Nombre, email, password y rol son obligatorios'
+            });
+        }
+
+        const resultado = await db.run(
+            'INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)',
+            [nombre, email, password, rol]
+        );
+
+        res.status(201).json({
+            mensaje: 'Usuario creado correctamente',
+            id: resultado.lastID
+        });
+
+    } catch (error) {
+        if (error.message.includes('UNIQUE')) {
+            return res.status(400).json({
+                error: 'El email ya está registrado'
+            });
+        }
+
+        res.status(500).json({
+            error: 'Error al crear el usuario'
+        });
+    }
+});
+// Obtener todos los usuarios
+app.get('/usuarios', async (req, res) => {
+    try {
+        const usuarios = await db.all(
+            'SELECT id, nombre, email, rol FROM usuarios'
+        );
+
+        res.json(usuarios);
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al obtener los usuarios'
+        });
+    }
+});
+// Actualizar un usuario
+app.put('/usuarios/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, email, password, rol } = req.body;
+
+        if (!nombre || !email || !password || !rol) {
+            return res.status(400).json({
+                error: 'Nombre, email, password y rol son obligatorios'
+            });
+        }
+
+        const resultado = await db.run(
+            'UPDATE usuarios SET nombre = ?, email = ?, password = ?, rol = ? WHERE id = ?',
+            [nombre, email, password, rol, id]
+        );
+
+        if (resultado.changes === 0) {
+            return res.status(404).json({
+                error: 'Usuario no encontrado'
+            });
+        }
+
+        res.json({
+            mensaje: 'Usuario actualizado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al actualizar el usuario'
+        });
+    }
+});
+// Eliminar un usuario
+app.delete('/usuarios/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const resultado = await db.run(
+            'DELETE FROM usuarios WHERE id = ?',
+            [id]
+        );
+
+        if (resultado.changes === 0) {
+            return res.status(404).json({
+                error: 'Usuario no encontrado'
+            });
+        }
+
+        res.json({
+            mensaje: 'Usuario eliminado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al eliminar el usuario'
         });
     }
 });
