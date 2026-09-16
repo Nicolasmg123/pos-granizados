@@ -134,6 +134,7 @@ Content-Type: application/json
 ###
 
 GET http://localhost:3000/productos
+
 ###
 
 POST http://localhost:3000/productos
@@ -144,3 +145,111 @@ Content-Type: application/json
   "precio": 5000,
   "stock": 20
 }
+
+###
+
+GET http://localhost:3000/productos
+
+###
+
+PUT http://localhost:3000/productos/3
+Content-Type: application/json
+
+{
+  "nombre": "Granizado de Mango Grande",
+  "precio": 6000,
+  "stock": 25
+}
+
+###
+
+DELETE http://localhost:3000/productos/3
+
+###
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Nicolas",
+  "email": "nicolas@granizados.com",
+  "password": "123456",
+  "rol": "Administrador"
+}
+
+###
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Joan Sebastian",
+  "email": "joan@granizados.com",
+  "password": "123456",
+  "rol": "Cajero"
+}
+
+###
+
+GET http://localhost:3000/usuarios
+
+###
+
+PUT http://localhost:3000/usuarios/3
+Content-Type: application/json
+
+{
+  "nombre": "Joan Sebastián",
+  "email": "joan@granizados.com",
+  "password": "123456",
+  "rol": "Cajero"
+}
+
+###
+
+DELETE http://localhost:3000/usuarios/3
+
+###
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Joan Sebastian",
+  "email": "joan@granizados.com",
+  "password": "123456",
+  "rol": "Cajero"
+}
+
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "joan@granizados.com",
+  "password": "123456"
+}
+
+###
+
+PUT http://localhost:3000/productos/2/stock
+Content-Type: application/json
+
+{
+  "stock": 50
+}
+
+###
+
+POST http://localhost:3000/ventas
+Content-Type: application/json
+
+{
+  "producto_id": 2,
+  "cantidad": 3
+}
+
+###
+
+GET http://localhost:3000/productos
