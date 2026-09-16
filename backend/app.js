@@ -270,6 +270,39 @@ app.delete('/usuarios/:id', async (req, res) => {
         });
     }
 });
+// Login de usuario
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                error: 'Email y password son obligatorios'
+            });
+        }
+
+        const usuario = await db.get(
+            'SELECT id, nombre, email, rol FROM usuarios WHERE email = ? AND password = ?',
+            [email, password]
+        );
+
+        if (!usuario) {
+            return res.status(401).json({
+                error: 'Email o password incorrectos'
+            });
+        }
+
+        res.json({
+            mensaje: 'Login exitoso',
+            usuario: usuario
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al realizar el login'
+        });
+    }
+});
 // Iniciar servidor
 iniciarBaseDeDatos()
     .then(() => {
