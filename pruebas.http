@@ -134,3 +134,13 @@ Content-Type: application/json
 ###
 
 GET http://localhost:3000/productos
+###
+
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Granizado de Mango",
+  "precio": 5000,
+  "stock": 20
+}
