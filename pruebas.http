@@ -121,3 +121,16 @@ Content-Type: application/json
 ###
 
 GET http://localhost:3000/productos
+###
+
+POST http://localhost:3000/ventas
+Content-Type: application/json
+
+{
+  "producto_id": 2,
+  "cantidad": 3
+}
+
+###
+
+GET http://localhost:3000/productos

@@ -18,21 +18,30 @@ async function iniciarBaseDeDatos() {
     });
 
     await db.exec(`
-    CREATE TABLE IF NOT EXISTS productos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        precio REAL NOT NULL,
-        stock INTEGER NOT NULL DEFAULT 0
-    );
+        CREATE TABLE IF NOT EXISTS productos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            precio REAL NOT NULL,
+            stock INTEGER NOT NULL DEFAULT 0
+        );
 
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        rol TEXT NOT NULL
-    )
-`);
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            rol TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS ventas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            cantidad INTEGER NOT NULL,
+            total REAL NOT NULL,
+            fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+        )
+    `);
 
     console.log('Base de datos SQLite conectada');
 }
@@ -307,6 +316,65 @@ app.delete('/usuarios/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({
             error: 'Error al eliminar el usuario'
+        });
+    }
+});
+// Registrar una venta
+app.post('/ventas', async (req, res) => {
+    try {
+        const { producto_id, cantidad } = req.body;
+
+        if (!producto_id || !cantidad) {
+            return res.status(400).json({
+                error: 'Producto y cantidad son obligatorios'
+            });
+        }
+
+        if (cantidad <= 0) {
+            return res.status(400).json({
+                error: 'La cantidad debe ser mayor que 0'
+            });
+        }
+
+        const producto = await db.get(
+            'SELECT * FROM productos WHERE id = ?',
+            [producto_id]
+        );
+
+        if (!producto) {
+            return res.status(404).json({
+                error: 'Producto no encontrado'
+            });
+        }
+
+        if (producto.stock < cantidad) {
+            return res.status(400).json({
+                error: 'Stock insuficiente'
+            });
+        }
+
+        const total = producto.precio * cantidad;
+
+        await db.run(
+            'INSERT INTO ventas (producto_id, cantidad, total) VALUES (?, ?, ?)',
+            [producto_id, cantidad, total]
+        );
+
+        await db.run(
+            'UPDATE productos SET stock = stock - ? WHERE id = ?',
+            [cantidad, producto_id]
+        );
+
+        res.status(201).json({
+            mensaje: 'Venta registrada correctamente',
+            producto: producto.nombre,
+            cantidad: cantidad,
+            total: total
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al registrar la venta'
         });
     }
 });
