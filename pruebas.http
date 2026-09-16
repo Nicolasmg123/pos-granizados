@@ -81,4 +81,43 @@ Content-Type: application/json
   "password": "123456"
 }
 
-POST /login
+###
+
+PUT http://localhost:3000/productos/1/stock
+Content-Type: application/json
+
+{
+  "stock": 50
+}
+
+###
+
+GET http://localhost:3000/productos
+
+###
+
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Granizado de Mango",
+  "precio": 5000,
+  "stock": 20
+}
+
+###
+
+GET http://localhost:3000/
+
+###
+
+PUT http://localhost:3000/productos/2/stock
+Content-Type: application/json
+
+{
+  "stock": 50
+}
+
+###
+
+GET http://localhost:3000/productos

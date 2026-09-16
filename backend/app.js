@@ -163,6 +163,46 @@ app.delete('/productos/:id', async (req, res) => {
         });
     }
 });
+// Actualizar stock de un producto
+app.put('/productos/:id/stock', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { stock } = req.body;
+
+        if (stock === undefined) {
+            return res.status(400).json({
+                error: 'El stock es obligatorio'
+            });
+        }
+
+        if (stock < 0) {
+            return res.status(400).json({
+                error: 'El stock no puede ser negativo'
+            });
+        }
+
+        const resultado = await db.run(
+            'UPDATE productos SET stock = ? WHERE id = ?',
+            [stock, id]
+        );
+
+        if (resultado.changes === 0) {
+            return res.status(404).json({
+                error: 'Producto no encontrado'
+            });
+        }
+
+        res.json({
+            mensaje: 'Stock actualizado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al actualizar el stock'
+        });
+    }
+});
+
 // Crear un usuario
 app.post('/usuarios', async (req, res) => {
     try {
